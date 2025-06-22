@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>幸运刮刮乐 | 网页版游戏</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #fff;
+        }
+        
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background: rgba(10, 15, 30, 0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            padding: 35px;
+            text-align: center;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+        
+        header {
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        h1 {
+            font-size: 3.2rem;
+            margin-bottom: 15px;
+            text-shadow: 0 3px 6px rgba(0, 0, 0, 0.5);
+            color: #FFD700;
+            letter-spacing: 3px;
+            background: linear-gradient(to right, #FFD700, #FFA500, #FFD700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            font-size: 1.4rem;
+            opacity: 0.9;
+            margin-bottom: 25px;
+            color: #e0e0ff;
+        }
+        
+        .content-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+            margin: 30px 0;
+        }
+        
+        .text-section {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(30, 40, 80, 0.6);
+            padding: 25px;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            line-height: 1.7;
+            text-align: left;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .text-section h2 {
+            color: #FFD700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.8rem;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        
+        .text-section p {
+            margin-bottom: 18px;
+            padding-left: 15px;
+            border-left: 3px solid #3498db;
+            color: #e0e0ff;
+        }
+        
+        .text-section ul {
+            padding-left: 30px;
+            margin: 15px 0;
+        }
+        
+        .text-section li {
+            margin-bottom: 10px;
+            color: #e0e0ff;
+        }
+        
+        .text-section li i {
+            color: #FFD700;
+            margin-right: 10px;
+        }
+        
+        .instructions {
+            background: rgba(30, 40, 80, 0.6);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 25px 0;
+            font-size: 1.15rem;
+            line-height: 1.7;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .instructions i {
+            color: #FFD700;
+            margin-right: 10px;
+        }
+        
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            margin: 30px auto;
+            max-width: 700px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+        
+        .grid-item {
+            aspect-ratio: 1/1;
+            background: #2c3e50;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .grid-item:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+        
+        .grid-item .content {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            text-align: center;
+            padding: 10px;
+            color: #2c3e50;
+            background: linear-gradient(135deg, #f5f7fa, #e4e7f0);
+            z-index: 1;
+        }
+        
+        .grid-item .cover {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #c94b4b, #4b134f);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.3rem;
+            transition: opacity 0.5s;
+            border-radius: 10px;
+            z-index: 2;
+        }
+        
+        .grid-item .cover i {
+            font-size: 2rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        .grid-item.scratched .cover {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 16px 35px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(to right, #FFD700, #FFA500);
+            color: #2c3e50;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: 0.5s;
+        }
+        
+        button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+        }
+        
+        button:hover::before {
+            left: 100%;
+        }
+        
+        button:active {
+            transform: translateY(2px);
+        }
+        
+        #reset-btn {
+            background: linear-gradient(to right, #2ecc71, #27ae60);
+            color: white;
+        }
+        
+        .prizes {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        
+        .prize-item {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px 25px;
+            border-radius: 50px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.1rem;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .prize-item i {
+            color: #FFD700;
+            font-size: 1.4rem;
+        }
+        
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            opacity: 0.8;
+            font-size: 1.05rem;
+            color: #e0e0ff;
+            max-width: 800px;
+            padding: 0 20px;
+        }
+        
+        .deployment-section {
+            background: rgba(30, 40, 80, 0.6);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 30px 0;
+            text-align: left;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .deployment-section h2 {
+            color: #FFD700;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.8rem;
+        }
+        
+        .deployment-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+        
+        .step {
+            background: rgba(20, 30, 60, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #FFD700;
+        }
+        
+        .step h3 {
+            color: #FFD700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .step p {
+            color: #e0e0ff;
+            line-height: 1.6;
+        }
+        
+        @media (max-width: 900px) {
+            .grid-container {
+                grid-template-columns: repeat(4, 1fr);
+                max-width: 500px;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .text-section, .deployment-section {
+                min-width: 100%;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .grid-container {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            button {
+                width: 100%;
+                max-width: 350px;
+            }
+            
+            .prizes {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+        
+        .win-animation {
+            animation: winPulse 1.5s infinite;
+        }
+        
+        @keyframes winPulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 20px rgba(255, 215, 0, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); }
+        }
+        
+        .special-prize {
+            background: linear-gradient(135deg, #ff9a9e, #fad0c4) !important;
+            color: #c0392b !important;
+            font-weight: 800 !important;
+        }
+        
+        .gold-border {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .gold-border::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #ffd700, #ffa500, #ffd700, #ffa500);
+            z-index: -1;
+            border-radius: 12px;
+        }
+        
+        .gold-border::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: inherit;
+            border-radius: 10px;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1><i class="fas fa-ticket-alt"></i> 幸运刮刮乐</h1>
+                <p class="subtitle">刮出惊喜，赢取大奖！</p>
+            </div>
+        </header>
+        
+        <div class="content-section">
+            <div class="text-section gold-border">
+                <h2><i class="fas fa-info-circle"></i> 活动说明</h2>
+                <p>欢迎参加本次刮刮乐活动！本游戏共有36个格子，包含以下特殊奖品：</p>
+                <ul>
+                    <li><i class="fas fa-star"></i> 神秘大奖：豪华礼包一份</li>
+                    <li><i class="fas fa-redo"></i> 再刮一次：额外游戏机会</li>
+                    <li><i class="fas fa-handshake"></i> 谢谢惠顾：感谢参与</li>
+                </ul>
+                <p>其余33个格子为普通奖品，每次重置游戏都会随机分配奖品位置。</p>
+            </div>
+            
+            <div class="text-section gold-border">
+                <h2><i class="fas fa-gift"></i> 奖品说明</h2>
+                <p><strong>神秘大奖：</strong>价值1000元的豪华礼包（包含高级电子产品、购物卡和精美礼品）</p>
+                <p><strong>再刮一次：</strong>额外获得一次游戏机会，可继续刮开另一个格子</p>
+                <p><strong>谢谢惠顾：</strong>感谢您的参与，祝您下次好运</p>
+                <p><strong>普通奖品：</strong>包括各种小礼品、优惠券和纪念品</p>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <p><i class="fas fa-mouse-pointer"></i> 游戏说明：点击任意格子刮开涂层，寻找隐藏的奖品！刮中神秘大奖会有特殊提示，祝您好运！</p>
+        </div>
+        
+        <div class="prizes">
+            <div class="prize-item"><i class="fas fa-star"></i> 神秘大奖</div>
+            <div class="prize-item"><i class="fas fa-redo"></i> 再刮一次</div>
+            <div class="prize-item"><i class="fas fa-handshake"></i> 谢谢惠顾</div>
+        </div>
+        
+        <div class="grid-container" id="grid"></div>
+        
+        <div class="controls">
+            <button id="reset-btn"><i class="fas fa-redo"></i> 重置游戏</button>
+            <button id="reveal-btn"><i class="fas fa-eye"></i> 显示所有奖品</button>
+        </div>
+        
+        <div class="deployment-section">
+            <h2><i class="fas fa-server"></i> 网页部署指南</h2>
+            <div class="deployment-steps">
+                <div class="step">
+                    <h3><i class="fas fa-save"></i> 步骤一：保存文件</h3>
+                    <p>复制本页所有代码，粘贴到文本编辑器中，保存为 <code>scratch-card.html</code> 文件</p>
+                </div>
+                <div class="step">
+                    <h3><i class="fas fa-file-upload"></i> 步骤二：选择托管方式</h3>
+                    <p>选择以下一种方式托管您的网页：</p>
+                    <p>- GitHub Pages（免费）</p>
+                    <p>- Netlify/Vercel（免费）</p>
+                    <p>- 传统虚拟主机</p>
+                </div>
+                <div class="step">
+                    <h3><i class="fas fa-cloud-upload-alt"></i> 步骤三：上传文件</h3>
+                    <p>将HTML文件上传到您选择的托管平台：</p>
+                    <p>- GitHub：上传到仓库并启用Pages</p>
+                    <p>- Netlify：拖放文件到部署区域</p>
+                    <p>- 虚拟主机：通过FTP上传</p>
+                </div>
+                <div class="step">
+                    <h3><i class="fas fa-link"></i> 步骤四：访问链接</h3>
+                    <p>获取托管平台提供的访问链接，通过电脑或手机浏览器打开即可</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>© 2023 幸运刮刮乐 | 完全响应式设计 | 手机和电脑均可畅玩 | 部署到服务器即可全球访问</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const grid = document.getElementById('grid');
+            const resetBtn = document.getElementById('reset-btn');
+            const revealBtn = document.getElementById('reveal-btn');
+            
+            // 自定义奖品库
+            const specialPrizes = ['神秘大奖', '再刮一次', '谢谢惠顾'];
+            
+            // 自定义普通奖品库
+            const regularPrizes = [
+                '小玩偶', '5元红包', '优惠券8折', '咖啡一杯',
+                '电影票', '纪念品', '免运费券', '买一送一',
+                '积分10点', '钥匙扣', '小礼品', '折扣券',
+                '谢谢参与', '祝您好运', '下次再来', '小挂件'
+            ];
+            
+            // 创建36个格子
+            function createGrid() {
+                grid.innerHTML = '';
+                
+                // 创建奖品数组：3个特殊奖品 + 33个常规奖品
+                let prizes = [...specialPrizes];
+                for (let i = 0; i < 33; i++) {
+                    const randomIndex = Math.floor(Math.random() * regularPrizes.length);
+                    prizes.push(regularPrizes[randomIndex]);
+                }
+                
+                // 随机打乱奖品顺序
+                prizes = shuffleArray(prizes);
+                
+                // 创建格子
+                for (let i = 0; i < 36; i++) {
+                    const gridItem = document.createElement('div');
+                    gridItem.className = 'grid-item';
+                    
+                    // 创建内容层
+                    const contentDiv = document.createElement('div');
+                    contentDiv.className = 'content';
+                    contentDiv.textContent = prizes[i];
+                    
+                    // 如果是特殊奖品，添加特殊样式
+                    if (specialPrizes.includes(prizes[i])) {
+                        contentDiv.classList.add('special-prize');
+                    }
+                    
+                    // 创建覆盖层
+                    const coverDiv = document.createElement('div');
+                    coverDiv.className = 'cover';
+                    coverDiv.innerHTML = '<i class="fas fa-question"></i>';
+                    
+                    // 添加点击事件
+                    coverDiv.addEventListener('click', () => {
+                        gridItem.classList.add('scratched');
+                        
+                        // 如果是神秘大奖，添加动画效果和提示
+                        if (prizes[i] === '神秘大奖') {
+                            gridItem.classList.add('win-animation');
+                            setTimeout(() => {
+                                alert('🎉 恭喜您刮中神秘大奖！获得价值1000元的豪华礼包！');
+                            }, 500);
+                        }
+                        
+                        // 如果是再刮一次，提示用户
+                        if (prizes[i] === '再刮一次') {
+                            setTimeout(() => {
+                                alert('🔄 恭喜您获得再刮一次的机会！请继续刮开另一个格子。');
+                            }, 500);
+                        }
+                    });
+                    
+                    gridItem.appendChild(contentDiv);
+                    gridItem.appendChild(coverDiv);
+                    grid.appendChild(gridItem);
+                }
+            }
+            
+            // 洗牌算法（随机打乱数组）
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+                return array;
+            }
+            
+            // 重置游戏
+            resetBtn.addEventListener('click', createGrid);
+            
+            // 显示所有奖品
+            revealBtn.addEventListener('click', () => {
+                const items = document.querySelectorAll('.grid-item');
+                items.forEach(item => {
+                    item.classList.add('scratched');
+                });
+            });
+            
+            // 初始化游戏
+            createGrid();
+        });
+    </script>
+</body>
+</html>
